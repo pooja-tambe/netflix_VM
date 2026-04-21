@@ -1,0 +1,40 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  TF_VERSION: '4.68.0'
+
+stages:
+
+# ---------- STAGE 1: INIT ----------
+- stage: Init
+  jobs:
+  - job: InitJob
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: '$(TF_VERSION)'
+
+    - script: terraform init
+      displayName: "Terraform Init"
+
+# ---------- STAGE 2: PLAN ----------
+- stage: Plan
+  dependsOn: Init
+  jobs:
+  - job: PlanJob
+    steps:
+    - script: terraform plan
+      displayName: "Terraform Plan"
+
+# ---------- STAGE 3: APPLY ----------
+- stage: Apply
+  dependsOn: Plan
+  jobs:
+  - job: ApplyJob
+    steps:
+    - script: terraform apply -auto-approve
+      displayName: "Terraform Apply"
