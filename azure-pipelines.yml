@@ -15,16 +15,14 @@ stages:
   - job: InitJob
     steps:
 
-    - script: |
-        echo "Installing Terraform..."
-        wget https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip
-        unzip terraform_$(TF_VERSION)_linux_amd64.zip
-        sudo mv terraform /usr/local/bin/
-        terraform -version
+    - task: TerraformInstaller@1
       displayName: Install Terraform
+      inputs:
+        terraformVersion: $(TF_VERSION)
 
     - script: terraform init
       displayName: Terraform Init
+
 
 # ---------- STAGE 2: PLAN ----------
 - stage: Plan
@@ -33,11 +31,16 @@ stages:
   - job: PlanJob
     steps:
 
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: $(TF_VERSION)
+
     - script: terraform init
       displayName: Terraform Init
 
     - script: terraform plan
       displayName: Terraform Plan
+
 
 # ---------- STAGE 3: APPLY ----------
 - stage: Apply
@@ -45,6 +48,10 @@ stages:
   jobs:
   - job: ApplyJob
     steps:
+
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: $(TF_VERSION)
 
     - script: terraform init
       displayName: Terraform Init
