@@ -16,12 +16,17 @@ stages:
     steps:
 
     - task: TerraformInstaller@1
-      displayName: Install Terraform
       inputs:
         terraformVersion: $(TF_VERSION)
 
-    - script: terraform init
+    - task: AzureCLI@2
       displayName: Terraform Init
+      inputs:
+        azureSubscription: 'my-service-connection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          terraform init
 
 
 # ---------- STAGE 2: PLAN ----------
@@ -35,11 +40,15 @@ stages:
       inputs:
         terraformVersion: $(TF_VERSION)
 
-    - script: terraform init
-      displayName: Terraform Init
-
-    - script: terraform plan
+    - task: AzureCLI@2
       displayName: Terraform Plan
+      inputs:
+        azureSubscription: 'my-service-connection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          terraform init
+          terraform plan
 
 
 # ---------- STAGE 3: APPLY ----------
@@ -53,8 +62,12 @@ stages:
       inputs:
         terraformVersion: $(TF_VERSION)
 
-    - script: terraform init
-      displayName: Terraform Init
-
-    - script: terraform apply -auto-approve
+    - task: AzureCLI@2
       displayName: Terraform Apply
+      inputs:
+        azureSubscription: 'my-service-connection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          terraform init
+          terraform apply -auto-approve
